@@ -11,14 +11,27 @@ interface Response {
 const App = () => {
   const [inputFile, setInputFile] = useState(process.env.INPUT_FILE);
   const [outputDir, setOutputDir] = useState(process.env.OUTPUT_FILE);
-  const [result, setResult] = useState<Response>();
+  const [result, setResult] = useState<Response | undefined>(undefined);
 
   const handleSeparate = async () => {
     try {
+      if (!inputFile) {
+        setResult({ status: "Error", message: "Input file is required" });
+        return;
+      }
+
+      if (!outputDir) {
+        setResult({ status: "Error", message: "Output directory is required" });
+        return;
+      }
+
+      setResult(undefined);
+
       const response = await invoke<Response>("run_spleeter", {
         inputFile,
         outputDir,
       });
+
       setResult(response);
     } catch (error) {
       setResult({ status: "Error", message: (error as Error).message });

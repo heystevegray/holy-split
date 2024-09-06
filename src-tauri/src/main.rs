@@ -1,6 +1,5 @@
 use serde::Serialize;
 use std::{env, process::Command};
-use tauri::command;
 
 // Define the Status enum
 #[derive(Serialize)]
@@ -33,11 +32,15 @@ impl Response {
     }
 }
 
-#[command]
+#[tauri::command]
 fn run_spleeter(input_file: String, output_dir: String) -> Response {
     // Get the current working directory
     let current_dir = std::env::current_dir().unwrap();
     let current_dir_str = current_dir.to_str().unwrap();
+
+    // Log the input and output directories
+    println!("Input file: {}", input_file);
+    println!("Output directory: {}", output_dir);
 
     // Construct the path to the Spleeter executable
     let spleeter_executable = if cfg!(target_os = "windows") {
