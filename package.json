@@ -6,12 +6,17 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
+    "python:build": "pyinstaller --onefile src-tauri/src-python/spleeter.py --distpath src-tauri/src-python/dist/executable --workpath src-tauri/src-python/dist/build --specpath src-tauri/src-python/dist/spec"
   },
   "dependencies": {
+    "@tauri-apps/api": "^1.6.0",
+    "next": "14.2.8",
     "react": "^18",
-    "react-dom": "^18",
-    "next": "14.2.8"
+    "react-dom": "^18"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.6.1",
