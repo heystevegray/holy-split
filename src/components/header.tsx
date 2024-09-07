@@ -5,7 +5,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { LinkButton } from "./ui/button";
 import { SquarePen } from "lucide-react";
 
-export const Logo = ({ size = 100 }: { size?: number }) => (
+export const Logo = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width="24"

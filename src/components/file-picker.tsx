@@ -9,7 +9,7 @@ import { isDevelopmentEnvironment } from "@/lib/utils";
 
 export default function FilePicker() {
   const [audioFile, setAudioFile] = useState<File | null>(null);
-  const [outputFolder, setOutputFolder] = useState<string>("");
+  const [outputFolder] = useState<string>("");
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -23,8 +23,9 @@ export default function FilePicker() {
 
   const handleFolderSelection = async () => {
     try {
-      const dirHandle = await window.showDirectoryPicker();
-      setOutputFolder(dirHandle.name);
+      // const dirHandle = await window.showDirectoryPicker();
+      // setOutputFolder(dirHandle.name);
+      toast.error("Not implemented yet.");
     } catch (error) {
       toast.error("Failed to select output folder. Please try again.", {
         description: isDevelopmentEnvironment()
