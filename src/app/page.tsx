@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { invoke } from "@tauri-apps/api/tauri";
+import FilePicker from "@/components/ui/file-picker";
 
 interface Response {
   status: "Success" | "Error";
@@ -9,28 +10,35 @@ interface Response {
 }
 
 const App = () => {
-  const [inputFile, setInputFile] = useState(process.env.INPUT_FILE);
-  const [outputDir, setOutputDir] = useState(process.env.OUTPUT_FILE);
   const [result, setResult] = useState<Response | undefined>(undefined);
 
   const handleSeparate = async () => {
     try {
-      if (!inputFile) {
-        setResult({ status: "Error", message: "Input file is required" });
-        return;
-      }
+      // if (!inputFile) {
+      //   setResult({ status: "Error", message: "Input file is required" });
+      //   return;
+      // }
 
-      if (!outputDir) {
-        setResult({ status: "Error", message: "Output directory is required" });
-        return;
-      }
+      // if (!outputDir) {
+      //   setResult({ status: "Error", message: "Output directory is required" });
+      //   return;
+      // }
 
-      setResult(undefined);
+      // console.log({ inputFile, outputDir });
+
+      return;
+
+      setResult({
+        status: "Success",
+        message: "Separating audio...",
+      });
 
       const response = await invoke<Response>("run_spleeter", {
         inputFile,
         outputDir,
       });
+
+      console.log({ response });
 
       setResult(response);
     } catch (error) {
@@ -38,61 +46,7 @@ const App = () => {
     }
   };
 
-  return (
-    <div
-      style={{
-        padding: "20px",
-        display: "flex",
-        width: "100%",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <h1>Holy Split Batman</h1>
-      <br />
-      <input
-        style={{
-          width: "50%",
-          background: "#303030",
-          padding: "5px",
-        }}
-        type="text"
-        placeholder="Input File"
-        value={inputFile}
-        onChange={(e) => setInputFile(e.target.value)}
-      />
-      <br />
-      <input
-        style={{
-          width: "50%",
-          background: "#303030",
-          padding: "5px",
-        }}
-        type="text"
-        placeholder="Output Directory"
-        value={outputDir}
-        onChange={(e) => setOutputDir(e.target.value)}
-      />
-      <br />
-      <button
-        style={{
-          background: "#303030",
-          padding: "5px",
-          color: "white",
-          border: "none",
-          cursor: "pointer",
-        }}
-        onClick={handleSeparate}
-      >
-        Separate
-      </button>
-      <br />
-      <p style={{ color: result?.status === "Error" ? "red" : undefined }}>
-        {result?.message}
-      </p>
-    </div>
-  );
+  return <FilePicker />;
 };
 
 export default App;

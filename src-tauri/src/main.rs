@@ -32,33 +32,45 @@ impl Response {
     }
 }
 
+// #[tauri::command]
+// fn run_spleeter(input_file: String, output_dir: String) -> Response {
+//     // Log the input and output directories
+//     println!("Input file: {}", input_file);
+//     println!("Output directory: {}", output_dir);
+
+//     Response::success(
+//         "Input file: ".to_string() + &input_file + " Output directory: " + &output_dir,
+//     )
+// }
+
 #[tauri::command]
 fn run_spleeter(input_file: String, output_dir: String) -> Response {
     // Get the current working directory
     let current_dir = std::env::current_dir().unwrap();
     let current_dir_str = current_dir.to_str().unwrap();
 
-    // Log the input and output directories
+    println!("Current working directory: {}", current_dir_str);
     println!("Input file: {}", input_file);
     println!("Output directory: {}", output_dir);
 
-    // Construct the path to the Spleeter executable
-    let spleeter_executable = if cfg!(target_os = "windows") {
-        format!(
-            "{}/src-python/dist/executable/spleeter.exe",
-            current_dir_str
-        )
-    } else {
-        format!("{}/src-python/dist/executable/spleeter", current_dir_str)
-    };
+    // Join the input file and the working dir
+    let input_path = current_dir.join(&input_file);
+    let output_path = current_dir.join(&output_dir);
 
-    // Log the command
-    println!("Running spleeter executable: {}", spleeter_executable);
+    println!("Input file path: {:?}", input_path);
+    println!("Output directory path: {:?}", output_path);
 
-    // Execute the Spleeter binary with the input and output arguments
-    let output = Command::new(spleeter_executable)
-        .arg(input_file)
-        .arg(output_dir)
+    // spleeter separate -o audio_output -p spleeter:5stems-16kHz audio_example.mp3
+    let output: Result<std::process::Output, std::io::Error> = Command::new("spleeter")
+        .args(&[
+            "separate",
+            "-o",
+            output_dir.as_str(),
+            "-p",
+            "spleeter:5stems-16kHz",
+            input_file.as_str(),
+        ])
+        .current_dir(current_dir_str)
         .output();
 
     match output {
