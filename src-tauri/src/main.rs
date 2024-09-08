@@ -32,56 +32,53 @@ impl Response {
     }
 }
 
-// #[tauri::command]
-// fn run_spleeter(input_file: String, output_dir: String) -> Response {
-//     // Log the input and output directories
-//     println!("Input file: {}", input_file);
-//     println!("Output directory: {}", output_dir);
-
-//     Response::success(
-//         "Input file: ".to_string() + &input_file + " Output directory: " + &output_dir,
-//     )
-// }
-
 #[tauri::command]
-fn run_spleeter(input_file: String, output_dir: String) -> Response {
-    // Get the current working directory
-    let current_dir = std::env::current_dir().unwrap();
-    let current_dir_str = current_dir.to_str().unwrap();
+fn run_spleeter() -> Response {
+    println!("About to start spleeter");
+    // Response::success("nice".to_string());
 
-    println!("Current working directory: {}", current_dir_str);
+    let input_file = env::var("INPUT_FILE").unwrap();
+    let output_dir = env::var("OUTPUT_DIR").unwrap();
     println!("Input file: {}", input_file);
     println!("Output directory: {}", output_dir);
 
-    // Join the input file and the working dir
-    let input_path = current_dir.join(&input_file);
-    let output_path = current_dir.join(&output_dir);
+    // Get the current working directory
+    let current_dir = std::env::current_dir().unwrap();
+    let current_dir_str = current_dir.to_str().unwrap();
+    println!("Current working directory: {}", current_dir_str);
 
-    println!("Input file path: {:?}", input_path);
-    println!("Output directory path: {:?}", output_path);
+    // Define the path to the spleeter executable
+    let spleeter_relative_path = "/src/spleeter";
+    let spleeter_path: String = current_dir_str.to_string() + "/" + spleeter_relative_path;
+    println!("Spleeter path: {}", spleeter_path);
 
-    // spleeter separate -o audio_output -p spleeter:5stems-16kHz audio_example.mp3
-    let output: Result<std::process::Output, std::io::Error> = Command::new("spleeter")
+    // Run the spleeter command
+    let output: Result<std::process::Output, std::io::Error> = Command::new(spleeter_path)
         .args(&[
             "separate",
+            "-p",
+            "spleeter:5stems",
             "-o",
             output_dir.as_str(),
-            "-p",
-            "spleeter:5stems-16kHz",
             input_file.as_str(),
         ])
-        .current_dir(current_dir_str)
         .output();
 
     match output {
         Ok(output) => {
             if output.status.success() {
+                println!("Spleeter finished successfully");
                 Response::success(String::from_utf8_lossy(&output.stdout).to_string())
             } else {
+                println!("Spleeter failed");
+                println!("stderr: {}", String::from_utf8_lossy(&output.stderr));
                 Response::error(String::from_utf8_lossy(&output.stderr).to_string())
             }
         }
-        Err(err) => Response::error(format!("Failed to execute: {}", err)),
+        Err(err) => {
+            println!("Error: {}", err);
+            Response::error(format!("Failed to execute: {}", err))
+        }
     }
 }
 

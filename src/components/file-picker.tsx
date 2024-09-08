@@ -6,8 +6,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { isDevelopmentEnvironment } from "@/lib/utils";
+import { invoke } from "@tauri-apps/api";
+
+interface Response {
+  status: "Success" | "Error";
+  message: string;
+}
 
 export default function FilePicker() {
+  const [result, setResult] = useState<Response | undefined>(undefined);
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [outputFolder] = useState<string>("");
 
@@ -35,7 +42,19 @@ export default function FilePicker() {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    try {
+      const response = await invoke<Response>("run_spleeter");
+
+      console.log({ response });
+
+      setResult(response);
+    } catch (error) {
+      setResult({ status: "Error", message: (error as Error).message });
+    }
+
+    return;
+
     if (!audioFile || !outputFolder) {
       toast.error("Please select both an audio file and an output folder.");
       return;
@@ -48,7 +67,7 @@ export default function FilePicker() {
     <div className="max-w-md mx-auto mt-8 p-6 bg-card rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-6">Audio Processor</h2>
       <div className="space-y-4">
-        <div>
+        {/* <div>
           <Label htmlFor="audio-file">Select MP3 or WAV file</Label>
           <Input
             id="audio-file"
@@ -71,14 +90,17 @@ export default function FilePicker() {
               Select
             </Button>
           </div>
-        </div>
+        </div> */}
         <Button
           onClick={handleSubmit}
-          disabled={!audioFile || !outputFolder}
+          // disabled={!audioFile || !outputFolder}
           className="w-full"
         >
           Separate Audio
         </Button>
+        <p style={{ color: result?.status === "Error" ? "red" : undefined }}>
+          {result?.message}
+        </p>
       </div>
     </div>
   );
